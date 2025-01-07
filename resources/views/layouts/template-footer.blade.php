@@ -4,5 +4,5 @@
         Anything you want
     </div>
     <!-- Default to the left -->
-    <strong>Copyright &copy; 2024-{{ now()->year }} <a href="#">{{ config('app.name') }}</a>.</strong> All rights reserved.
+    <strong>Copyright &copy; 2024-{{ now()->year }} <a href="#">AssessPro</a>.</strong> All rights reserved.
 </footer>

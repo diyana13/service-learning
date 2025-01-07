@@ -31,9 +31,13 @@ Route::group(['middleware' => ['auth', 'role:student']], function () {
     Route::get('student/projects', [ProjectController::class, 'studentProject'])->name('student.student-project');
     Route::post('student/projects/search', [ProjectController::class, 'searchProject'])->name('student.search-project');
     Route::post('student/projects/{project}/register', [ProjectController::class, 'registerProject'])->name('student.register');
+    Route::get('student/projects/{project}/showStudent', [ProjectController::class, 'showStudent'])->name('student.show-project');
 });
 
 Route::group(['middleware' => ['auth', 'role:assessor']], function () {
     Route::get('assessor/home', [HomeController::class, 'assessorIndex'])->name('assessor.home');
-
+    Route::get('assessor/projects', [ProjectController::class, 'ProjectList'])->name('assessor.project-list');
+    Route::post('assessor/projects/search', [ProjectController::class, 'searchAssessor'])->name('assessor.search-project');
+    Route::post('assessor/projects/{project}/register', [ProjectController::class, 'ProjectAssessor'])->name('assessor.register');
+    Route::get('assessor/projects/{project}/showAssessor', [ProjectController::class, 'showAssessor'])->name('assessor.show-project');
 });
