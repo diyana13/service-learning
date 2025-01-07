@@ -6,7 +6,7 @@
         <div class="card-header">
             <div class="d-flex justify-content-end">
                 <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#modal-sm">
-                    <i class="fa fa-plus"></i> Add Project
+                    <i class="fa fa-plus"></i> Search Project
                 </button>
             </div>
         </div>
@@ -42,7 +42,7 @@
                         <td>{{ $project->project_code }}</td>
                         <td>{{ $project->description }}</td>
                         <td>
-                            <a href="{{ route('student.show-project', $project->id) }}" class="btn btn-sm btn-default">Show</a>
+                            <a href="{{ route('assessor.show-project', $project->id) }}" class="btn btn-sm btn-default">Show</a>
                 
                         </td>
                     </tr>
@@ -67,7 +67,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{{ route('student.search-project') }}">
+                <form method="POST" action="{{ route('assessor.search-project') }}">
                     @csrf
 
                     <div class="form-group">

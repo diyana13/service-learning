@@ -213,4 +213,67 @@ class ProjectController extends Controller
 
         return redirect()->route('student.student-project')->with('success', 'Project registered successfully');
     }
+
+    public function showStudent($id)
+    {
+        $project = Project::findOrFail($id);
+
+        $groups = Group::with('members.student')->where('project_id', $id)->get();
+        // dd($groups);
+        return view('student.show-project', compact('project', 'groups'));
+    }
+
+    public function ProjectList()
+    {
+
+        $userId = auth()->id();
+
+        $student = User::findOrFail($userId);
+
+        $projects = $student->groupMember()
+                            ->with('group.project')
+                            ->get()
+                            ->pluck('group.project')
+                            ->unique();
+        
+        // dd($projects);
+        return view('assessor.project-list', compact('projects'));
+    }
+
+    public function searchAssessor(Request $request)
+    {
+        $project_code = $request->project_code;
+        $project = Project::with('groups.members')->where('project_code', $project_code)->first();
+
+        // Filter groups that have not reached their maximum capacity
+        $maxGroupMembers = $project->max_group_members;
+        $availableGroups = $project->groups->filter(function ($group) use ($maxGroupMembers) {
+            return $group->members->count() < $maxGroupMembers;
+        });
+
+        // dd($availableGroups);
+
+        return view('assessor.register-project', [
+            'project' => $project,
+            'groups' => $availableGroups,
+        ]);
+    }
+
+    public function ProjectAssessor(Request $request, $id)
+    {
+        $project = Project::findOrFail($id);
+
+        return redirect()->route('assessor.project-list')->with('success', 'Project registered successfully');
+    }
+
+    public function showAssessor($id)
+    {
+        $project = Project::findOrFail($id);
+
+        $groups = Group::with('members.student')->where('project_id', $id)->get();
+        // dd($groups);
+        return view('assessor.show-project', compact('project', 'groups'));
+    }
+
+
 }

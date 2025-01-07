@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="col-lg-12">
-    <div class="card card-primary card-outline">
+    <div class="card card-maroon card-outline">
         <div class="card-header">
             <h5 class="m-0">Dashboard</h5>
         </div>
@@ -11,7 +11,7 @@
 
             <p class="card-text">With supporting text below as a natural lead-in to additional
                 content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+                <a href="#" class="btn btn-danger">Go to projects</a>
         </div>
     </div>
 </div>
