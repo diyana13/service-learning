@@ -14,9 +14,6 @@ class Project extends Model
         'description',
         'max_groups',
         'max_group_members',
-        'mark_lecturer',
-        'mark_student',
-        'mark_assessor',
         'lecturer_id',
     ];
 
@@ -28,5 +25,15 @@ class Project extends Model
     public function groups()
     {
         return $this->hasMany(Group::class, 'project_id');
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(ProjectRegistration::class, 'project_id');
+    }
+
+    public function projectRubrics()
+    {
+        return $this->hasMany(ProjectRubric::class, 'project_id');
     }
 }

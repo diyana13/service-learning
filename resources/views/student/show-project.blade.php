@@ -51,7 +51,7 @@
                         <div class="card-body">
                             <ul>
                                 @forelse ($group->members as $member)
-                                    <li>{{ $member->student->name }}</li>
+                                    <li>{{ $member->name }}</li>
                                 @empty
                                     <li>No student in this group</li>
                                 @endforelse
@@ -64,7 +64,7 @@
                         <div class="col-lg-4">
                             <div class="card card-maroon card-outline">
                                 <div class="card-header">
-                                    <h5 class="m-0">Group {{ $i + 1 }}</h5>
+                                    <h5 class="m-0">{{ $group->group_name }}</h5>
                                 </div>
                                 <div class="card-body">
                                     <p class="text-center">No student yet</p>

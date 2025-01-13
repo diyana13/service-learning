@@ -5,8 +5,8 @@
     <div class="card card-maroon card-outline">
         <div class="card-header">
             <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#modal-sm">
-                    <i class="fa fa-plus"></i> Search Project
+                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-sm">
+                    <i class="fa fa-plus"></i> Register Project
                 </button>
             </div>
         </div>
@@ -38,12 +38,11 @@
                     @forelse ($projects as $project)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $project->project_name }}</td>
-                        <td>{{ $project->project_code }}</td>
-                        <td>{{ $project->description }}</td>
+                        <td>{{ $project->projects->project_name }}</td>
+                        <td>{{ $project->projects->project_code }}</td>
+                        <td>{{ $project->projects->description }}</td>
                         <td>
-                            <a href="{{ route('assessor.show-project', $project->id) }}" class="btn btn-sm btn-default">Show</a>
-                
+                            <a href="{{ route('assessor.show-project', $project->projects->id) }}" class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
                         </td>
                     </tr>
                     @empty

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\Project;
+use App\Models\ProjectRegistration;
+use App\Models\ProjectRubric;
+use App\Models\Rubrics;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -23,13 +26,12 @@ class ProjectController extends Controller
         return view('lecturer.projects', compact('projects'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $uniqueCode = $this->generateUniqueCode();
-        return view('lecturer.create', compact('uniqueCode'));
+        $rubrics = Rubrics::all();
+
+        return view('lecturer.create', compact('uniqueCode', 'rubrics'));
     }
 
     private function generateUniqueCode()
@@ -52,9 +54,9 @@ class ProjectController extends Controller
             'description' => 'required',
             'max_groups' => 'required|integer',
             'max_group_members' => 'required|integer',
-            'mark_lecturer' => 'required|integer',
-            'mark_student' => 'required|integer',
-            'mark_assessor' => 'required|integer',
+            'lecturer_rubric' => 'required|array|max:4',
+            'student_rubric' => 'required|array|max:3',
+            'assessor_rubric' => 'required|array|max:3',
         ]);
         try {
             $store = new Project();
@@ -63,21 +65,53 @@ class ProjectController extends Controller
             $store->description = $request->description;
             $store->max_groups = $request->max_groups;
             $store->max_group_members = $request->max_group_members;
-            $store->mark_lecturer = $request->mark_lecturer;
-            $store->mark_student = $request->mark_student;
-            $store->mark_assessor = $request->mark_assessor;
             $store->lecturer_id = auth()->id();
             $store->save();
-
 
             for ($i = 0; $i < $request->max_groups; $i++) {
                 $group = new Group();
                 $group->project_id = $store->id;
+                $group->group_number = "Group " . ($i + 1);
                 $group->save();
             }
+
+            $rubricData = [];
+
+            if($request->lecturer_rubric) {
+                foreach($request->lecturer_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $store->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'lecturer',
+                    ];
+                }
+            }
+
+            if($request->student_rubric) {
+                foreach($request->student_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $store->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'student',
+                    ];
+                }
+            }
+
+            if($request->assessor_rubric) {
+                foreach($request->assessor_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $store->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'assessor',
+                    ];
+                }
+            }
+
+            ProjectRubric::insert($rubricData);
+            
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            return redirect()->route('lecturer.create')->with('error', 'Project unable to create');
+            return redirect()->route('lecturer.projects')->with('error', 'Project unable to create');
         }
         return redirect()->route('lecturer.projects')->with('success', 'Project created successfully');
     }
@@ -113,26 +147,18 @@ class ProjectController extends Controller
             'project_name' => 'required|string|max:255',
             'project_code' => 'required|string|max:255|unique:projects,project_code,' . $id,
             'description' => 'required',
-            'max_groups' => 'required|integer',
             'max_group_members' => 'required|integer',
-            'mark_lecturer' => 'required|integer',
-            'mark_student' => 'required|integer',
-            'mark_assessor' => 'required|integer',
         ]);
         try {
             $update->project_name = $request->project_name;
             $update->project_code = $request->project_code;
             $update->description = $request->description;
-            $update->max_groups = $request->max_groups;
             $update->max_group_members = $request->max_group_members;
-            $update->mark_lecturer = $request->mark_lecturer;
-            $update->mark_student = $request->mark_student;
-            $update->mark_assessor = $request->mark_assessor;
             $update->lecturer_id = auth()->id();
             $update->save();
         } catch (\Exception $e) {
             Log::error($e->getMessage());
-            return redirect()->route('lecturer.edit', $id)->with('error', 'Project unable to update');
+            return redirect()->route('lecturer.projects', $id)->with('error', 'Project unable to update');
         }
         return redirect()->route('lecturer.projects')->with('success', 'Project updated successfully');
     }
@@ -155,18 +181,10 @@ class ProjectController extends Controller
     // for student project that student involved
     public function studentProject()
     {
-
         $userId = auth()->id();
 
-        $student = User::findOrFail($userId);
-
-        $projects = $student->groupMember()
-                            ->with('group.project')
-                            ->get()
-                            ->pluck('group.project')
-                            ->unique();
+        $projects = ProjectRegistration::with('projects')->where('user_id', $userId)->get();
         
-        // dd($projects);
         return view('student.student-project', compact('projects'));
     }
 
@@ -175,13 +193,10 @@ class ProjectController extends Controller
         $project_code = $request->project_code;
         $project = Project::with('groups.members')->where('project_code', $project_code)->first();
 
-        // Filter groups that have not reached their maximum capacity
         $maxGroupMembers = $project->max_group_members;
         $availableGroups = $project->groups->filter(function ($group) use ($maxGroupMembers) {
             return $group->members->count() < $maxGroupMembers;
         });
-
-        // dd($availableGroups);
 
         return view('student.register-project', [
             'project' => $project,
@@ -191,35 +206,55 @@ class ProjectController extends Controller
 
     public function registerProject(Request $request, $id)
     {
-        $project = Project::findOrFail($id);
-
-        // Find the chosen group
-        $group = Group::findOrFail($request->group_id);
-
-        // Check if the group belongs to the project
-        if ($group->project_id != $project->id) {
-            return redirect()->route('student.student-project')->with('error', 'Invalid group selection');
+        try {
+            $project = Project::findOrFail($id);
+    
+            // Check if the student has already registered for the project
+            $userId = auth()->id();
+            $student = User::findOrFail($userId);
+            $registration = ProjectRegistration::where('user_id', $student->id)
+                ->where('project_id', $project->id)
+                ->first();
+    
+            if ($registration) {
+                return redirect()->route('student.student-project')->with('error', 'You have already registered for this project');
+            }
+    
+            // Register the student for the project
+            $register = new ProjectRegistration();
+            $register->project_id = $project->id;
+            $register->user_id = $student->id;
+            $register->save();
+    
+            // Find the chosen group
+            $group = Group::findOrFail($request->group_id);
+    
+            // Check if the group belongs to the project
+            if ($group->project_id != $project->id) {
+                return redirect()->route('student.student-project')->with('error', 'Invalid group selection');
+            }
+    
+            // Check if the group has reached the maximum number of members
+            if ($group->members->count() >= $project->max_group_members) {
+                return redirect()->route('student.student-project')->with('error', 'Group is full');
+            }
+    
+            // Add the student to the group
+            $group->members()->attach($student->id);
+    
+            return redirect()->route('student.student-project')->with('success', 'Project registered successfully');
+        } catch (\Exception $e) {
+            Log::error('Error registering project: ' . $e->getMessage());
+            return redirect()->route('student.student-project')->with('error', 'An error occurred while registering for the project');
         }
-
-        // Check if the group has reached the maximum number of members
-        if ($group->members->count() >= $project->max_group_members) {
-            return redirect()->route('student.student-project')->with('error', 'Group is full');
-        }
-
-        // Add the student to the group
-        $group->members()->create([
-            'student_id' => auth()->id(),
-        ]);
-
-        return redirect()->route('student.student-project')->with('success', 'Project registered successfully');
     }
 
     public function showStudent($id)
     {
         $project = Project::findOrFail($id);
 
-        $groups = Group::with('members.student')->where('project_id', $id)->get();
-        // dd($groups);
+        $groups = Group::with('members')->where('project_id', $id)->get();
+        
         return view('student.show-project', compact('project', 'groups'));
     }
 
@@ -228,13 +263,7 @@ class ProjectController extends Controller
 
         $userId = auth()->id();
 
-        $student = User::findOrFail($userId);
-
-        $projects = $student->groupMember()
-                            ->with('group.project')
-                            ->get()
-                            ->pluck('group.project')
-                            ->unique();
+        $projects = ProjectRegistration::with('projects')->where('user_id', $userId)->get();
         
         // dd($projects);
         return view('assessor.project-list', compact('projects'));
@@ -245,23 +274,33 @@ class ProjectController extends Controller
         $project_code = $request->project_code;
         $project = Project::with('groups.members')->where('project_code', $project_code)->first();
 
-        // Filter groups that have not reached their maximum capacity
-        $maxGroupMembers = $project->max_group_members;
-        $availableGroups = $project->groups->filter(function ($group) use ($maxGroupMembers) {
-            return $group->members->count() < $maxGroupMembers;
-        });
-
-        // dd($availableGroups);
-
-        return view('assessor.register-project', [
-            'project' => $project,
-            'groups' => $availableGroups,
-        ]);
+        return view('assessor.register-project', compact('project'));
     }
 
-    public function ProjectAssessor(Request $request, $id)
+    public function ProjectAssessor($id)
     {
         $project = Project::findOrFail($id);
+
+        try {
+            $userId = auth()->id();
+
+            $registration = ProjectRegistration::where('user_id', $userId)
+                ->where('project_id', $project->id)
+                ->first();
+
+            if ($registration) {
+                return redirect()->route('assessor.project-list')->with('error', 'You have already registered for this project');
+            }
+
+            $register = new ProjectRegistration();
+            $register->project_id = $project->id;
+            $register->user_id = $userId;
+            $register->save();
+        }
+        catch (\Exception $e) {
+            Log::error('Error registering project: ' . $e->getMessage());
+            return redirect()->route('assessor.project-list')->with('error', 'An error occurred while registering for the project');
+        }
 
         return redirect()->route('assessor.project-list')->with('success', 'Project registered successfully');
     }

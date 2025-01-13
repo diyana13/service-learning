@@ -50,7 +50,7 @@
                         <select name="group_id" id="group_id" class="form-control">
                             <option value="">-- Select Group --</option>
                             @foreach ($groups as $group)
-                                <option value="{{ $group->id }}">Group {{ $loop->iteration }} ({{ $group->members->count() }}/{{ $project->max_group_members }})</option>
+                                <option value="{{ $group->id }}">{{ $group->group_number }} ({{ $group->members->count() }}/{{ $project->max_group_members }})</option>
                             @endforeach
                         </select>
                     </div>

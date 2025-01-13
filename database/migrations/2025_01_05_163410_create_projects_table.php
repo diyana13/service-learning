@@ -18,9 +18,6 @@ return new class extends Migration
             $table->text('description');
             $table->integer('max_groups');
             $table->integer('max_group_members');
-            $table->integer('mark_lecturer');
-            $table->integer('mark_student');
-            $table->integer('mark_assessor');
             $table->foreignId('lecturer_id')->constrained('users', 'id')->cascadeOnDelete();
             $table->timestamps();
         });

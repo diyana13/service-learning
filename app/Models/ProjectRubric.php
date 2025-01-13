@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Group extends Model
+class ProjectRubric extends Model
 {
-    protected $table = 'groups';
+    protected $table = 'project_rubrics';
 
     protected $fillable = [
         'project_id',
-        'group_number',
+        'rubric_id',
+        'role',
     ];
 
     public function project()
@@ -18,8 +19,8 @@ class Group extends Model
         return $this->belongsTo(Project::class, 'project_id');
     }
 
-    public function members()
+    public function rubric()
     {
-        return $this->belongsToMany(User::class, 'group_members', 'group_id', 'student_id');
+        return $this->belongsTo(Rubrics::class, 'rubric_id');
     }
 }

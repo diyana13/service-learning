@@ -51,20 +51,13 @@ class User extends Authenticatable
         return $this->hasMany(Project::class, 'lecturer_id');
     }
 
-    public function groupMember()
+    public function groups()
     {
-        return $this->hasMany(GroupMembers::class, 'student_id');
+        return $this->belongsToMany(Group::class, 'group_members', 'student_id', 'group_id');
     }
 
-    public function group()
+    public function projectRegistrations()
     {
-        return $this->hasOneThrough(
-            Group::class,
-            GroupMembers::class,
-            'student_id',
-            'id',
-            'id',
-            'group_id'
-        );
+        return $this->hasMany(ProjectRegistration::class, 'student_id');
     }
 }

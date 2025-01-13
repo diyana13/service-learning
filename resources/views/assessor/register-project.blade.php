@@ -5,7 +5,7 @@
     <div class="card card-primary card-outline">
         <div class="card-header">
             <div class="d-flex justify-content-end">
-                <a href="{{ route('assessor.project-list') }}" class="btn btn-sm btn-danger">Back</a>
+                <a href="{{ route('assessor.project-list') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
             </div>
         </div>
 
@@ -38,14 +38,13 @@
                     <p class="form-control-plaintext">{{ $project->lecturer->name }}</p>
                 </div>
             </div>
-            <!-- Add more fields as needed -->
-            <hr>
-
+        </div>
+        <div class="card-footer">
             <form action="{{ route('assessor.register', $project->id) }}" method="POST">
                 @csrf
                 {{-- submit button --}}
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">Okay</button>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-sm btn-primary" style="width: 300px;">Register</button>
                 </div>
             </form>
         </div>

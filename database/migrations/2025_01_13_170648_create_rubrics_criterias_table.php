@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('groups', function (Blueprint $table) {
+        Schema::create('rubrics_criterias', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('project_id')->constrained('projects', 'id')->cascadeOnDelete();
-            $table->string('group_number');
+            $table->foreignId('rubric_id')->constrained('rubrics', 'id')->cascadeOnDelete();
+            $table->string('criteria_bm');
+            $table->string('criteria_bi');
+            $table->integer('score');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('groups');
+        Schema::dropIfExists('rubrics_criterias');
     }
 };
