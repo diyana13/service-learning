@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Assessment;
 use App\Models\Group;
+use App\Models\GroupMembers;
 use App\Models\Project;
 use App\Models\ProjectRegistration;
 use App\Models\ProjectRubric;
 use App\Models\Rubrics;
+use App\Models\StudentMark;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -19,9 +22,10 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::whereHas('lecturer', function ($query) {
-            $query->where('id', auth()->id());
-        })->get();
+        $projects = Project::with('groups.members')
+            ->whereHas('lecturer', function ($query) {
+                $query->where('id', auth()->id());
+            })->get();
 
         return view('lecturer.projects', compact('projects'));
     }
@@ -77,8 +81,8 @@ class ProjectController extends Controller
 
             $rubricData = [];
 
-            if($request->lecturer_rubric) {
-                foreach($request->lecturer_rubric as $rubricId) {
+            if ($request->lecturer_rubric) {
+                foreach ($request->lecturer_rubric as $rubricId) {
                     $rubricData[] = [
                         'project_id' => $store->id,
                         'rubric_id' => $rubricId,
@@ -87,8 +91,8 @@ class ProjectController extends Controller
                 }
             }
 
-            if($request->student_rubric) {
-                foreach($request->student_rubric as $rubricId) {
+            if ($request->student_rubric) {
+                foreach ($request->student_rubric as $rubricId) {
                     $rubricData[] = [
                         'project_id' => $store->id,
                         'rubric_id' => $rubricId,
@@ -97,8 +101,8 @@ class ProjectController extends Controller
                 }
             }
 
-            if($request->assessor_rubric) {
-                foreach($request->assessor_rubric as $rubricId) {
+            if ($request->assessor_rubric) {
+                foreach ($request->assessor_rubric as $rubricId) {
                     $rubricData[] = [
                         'project_id' => $store->id,
                         'rubric_id' => $rubricId,
@@ -108,7 +112,6 @@ class ProjectController extends Controller
             }
 
             ProjectRubric::insert($rubricData);
-            
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return redirect()->route('lecturer.projects')->with('error', 'Project unable to create');
@@ -134,13 +137,18 @@ class ProjectController extends Controller
     public function edit($id)
     {
         $project = Project::findOrFail($id);
-        return view('lecturer.edit', compact('project'));
+        $rubrics = Rubrics::all();
+        $chosenLecturerRubrics = $project->projectRubrics()->where('role', 'lecturer')->pluck('rubric_id')->toArray();
+        $chosenAssessorRubrics = $project->projectRubrics()->where('role', 'assessor')->pluck('rubric_id')->toArray();
+        $chosenStudentRubrics = $project->projectRubrics()->where('role', 'student')->pluck('rubric_id')->toArray();
+
+        return view('lecturer.edit', compact('project', 'rubrics', 'chosenLecturerRubrics', 'chosenAssessorRubrics', 'chosenStudentRubrics'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $update = Project::findOrFail($id);
         $request->validate([
@@ -148,6 +156,9 @@ class ProjectController extends Controller
             'project_code' => 'required|string|max:255|unique:projects,project_code,' . $id,
             'description' => 'required',
             'max_group_members' => 'required|integer',
+            'lecturer_rubric' => 'required|array|max:4',
+            'student_rubric' => 'required|array|max:3',
+            'assessor_rubric' => 'required|array|max:3',
         ]);
         try {
             $update->project_name = $request->project_name;
@@ -156,6 +167,46 @@ class ProjectController extends Controller
             $update->max_group_members = $request->max_group_members;
             $update->lecturer_id = auth()->id();
             $update->save();
+
+            // Delete existing ProjectRubric records for the project
+            ProjectRubric::where('project_id', $update->id)->delete();
+
+            // Prepare the new ProjectRubric data
+            $rubricData = [];
+
+            if ($request->lecturer_rubric) {
+                foreach ($request->lecturer_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $update->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'lecturer',
+                    ];
+                }
+            }
+
+            if ($request->student_rubric) {
+                foreach ($request->student_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $update->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'student',
+                    ];
+                }
+            }
+
+            if ($request->assessor_rubric) {
+                foreach ($request->assessor_rubric as $rubricId) {
+                    $rubricData[] = [
+                        'project_id' => $update->id,
+                        'rubric_id' => $rubricId,
+                        'role' => 'assessor',
+                    ];
+                }
+            }
+
+            // Insert the new ProjectRubric records
+            ProjectRubric::insert($rubricData);
+
         } catch (\Exception $e) {
             Log::error($e->getMessage());
             return redirect()->route('lecturer.projects', $id)->with('error', 'Project unable to update');
@@ -178,141 +229,68 @@ class ProjectController extends Controller
         return redirect()->route('lecturer.projects')->with('success', 'Project deleted successfully');
     }
 
-    // for student project that student involved
-    public function studentProject()
+    public function evaluate($id)
     {
-        $userId = auth()->id();
+        $group = Group::findOrFail($id);
+        $project = $group->project;
+        $projectID = $project->id;
+        $rubrics = ProjectRubric::where('project_id', $projectID)
+            ->where('role', 'lecturer')
+            ->with('rubric.rubricsCriteria')
+            ->get();
 
-        $projects = ProjectRegistration::with('projects')->where('user_id', $userId)->get();
-        
-        return view('student.student-project', compact('projects'));
+        return view('lecturer.evaluate', compact('group', 'rubrics', 'projectID'));
     }
 
-    public function searchProject(Request $request)
+    public function storeEvaluate(Request $request, $id)
     {
-        $project_code = $request->project_code;
-        $project = Project::with('groups.members')->where('project_code', $project_code)->first();
+        $group = Group::findOrFail($id);
+        $project = $group->project;
 
-        $maxGroupMembers = $project->max_group_members;
-        $availableGroups = $project->groups->filter(function ($group) use ($maxGroupMembers) {
-            return $group->members->count() < $maxGroupMembers;
-        });
+        $totalMarks = 0;
+        foreach ($request->score as $score) {
+            $totalMarks += $score;
+        }
 
-        return view('student.register-project', [
-            'project' => $project,
-            'groups' => $availableGroups,
-        ]);
-    }
-
-    public function registerProject(Request $request, $id)
-    {
         try {
-            $project = Project::findOrFail($id);
-    
-            // Check if the student has already registered for the project
-            $userId = auth()->id();
-            $student = User::findOrFail($userId);
-            $registration = ProjectRegistration::where('user_id', $student->id)
-                ->where('project_id', $project->id)
-                ->first();
-    
-            if ($registration) {
-                return redirect()->route('student.student-project')->with('error', 'You have already registered for this project');
+            $store = new Assessment();
+            $store->project_id = $project->id;
+            $store->group_id = $group->id;
+            $store->assessor_id = auth()->id();
+            $store->score = $totalMarks;
+            $store->comment = $request->comment;
+            $store->save();
+
+            $group->is_lecturer_evaluate = true;
+            $group->save();
+
+            foreach ($group->members as $member) {
+                StudentMark::updateOrCreate(
+                    [
+                        'student_id' => $member->student_id,
+                        'project_id' => $project->id,
+                    ],
+                    [
+                        'lecturer_score' => $totalMarks,
+                    ]
+                );
             }
-    
-            // Register the student for the project
-            $register = new ProjectRegistration();
-            $register->project_id = $project->id;
-            $register->user_id = $student->id;
-            $register->save();
-    
-            // Find the chosen group
-            $group = Group::findOrFail($request->group_id);
-    
-            // Check if the group belongs to the project
-            if ($group->project_id != $project->id) {
-                return redirect()->route('student.student-project')->with('error', 'Invalid group selection');
-            }
-    
-            // Check if the group has reached the maximum number of members
-            if ($group->members->count() >= $project->max_group_members) {
-                return redirect()->route('student.student-project')->with('error', 'Group is full');
-            }
-    
-            // Add the student to the group
-            $group->members()->attach($student->id);
-    
-            return redirect()->route('student.student-project')->with('success', 'Project registered successfully');
         } catch (\Exception $e) {
-            Log::error('Error registering project: ' . $e->getMessage());
-            return redirect()->route('student.student-project')->with('error', 'An error occurred while registering for the project');
-        }
-    }
-
-    public function showStudent($id)
-    {
-        $project = Project::findOrFail($id);
-
-        $groups = Group::with('members')->where('project_id', $id)->get();
-        
-        return view('student.show-project', compact('project', 'groups'));
-    }
-
-    public function ProjectList()
-    {
-
-        $userId = auth()->id();
-
-        $projects = ProjectRegistration::with('projects')->where('user_id', $userId)->get();
-        
-        // dd($projects);
-        return view('assessor.project-list', compact('projects'));
-    }
-
-    public function searchAssessor(Request $request)
-    {
-        $project_code = $request->project_code;
-        $project = Project::with('groups.members')->where('project_code', $project_code)->first();
-
-        return view('assessor.register-project', compact('project'));
-    }
-
-    public function ProjectAssessor($id)
-    {
-        $project = Project::findOrFail($id);
-
-        try {
-            $userId = auth()->id();
-
-            $registration = ProjectRegistration::where('user_id', $userId)
-                ->where('project_id', $project->id)
-                ->first();
-
-            if ($registration) {
-                return redirect()->route('assessor.project-list')->with('error', 'You have already registered for this project');
-            }
-
-            $register = new ProjectRegistration();
-            $register->project_id = $project->id;
-            $register->user_id = $userId;
-            $register->save();
-        }
-        catch (\Exception $e) {
-            Log::error('Error registering project: ' . $e->getMessage());
-            return redirect()->route('assessor.project-list')->with('error', 'An error occurred while registering for the project');
+            Log::error('Error evaluating group: ' . $e->getMessage());
+            return redirect()->route('lecturer.show', $id)->with('error', 'An error occurred while evaluating the group');
         }
 
-        return redirect()->route('assessor.project-list')->with('success', 'Project registered successfully');
+        return redirect()->route('lecturer.show', $id)->with('success', 'Group evaluated successfully');
     }
 
-    public function showAssessor($id)
+    public function studentsMark($id)
     {
-        $project = Project::findOrFail($id);
+        // $project = Project::findOrFail($id);
 
-        $groups = Group::with('members.student')->where('project_id', $id)->get();
-        // dd($groups);
-        return view('assessor.show-project', compact('project', 'groups'));
+        $studentsMarks = StudentMark::where('project_id', $id)
+            ->with('student')
+            ->get();
+
+        return view('lecturer.students-mark', compact('studentsMarks'));
     }
-
-
 }

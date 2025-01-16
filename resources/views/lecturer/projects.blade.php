@@ -7,11 +7,11 @@
     <div class="col-lg-12">
         <div class="card card-primary card-outline">
             <div class="card-header">
-                <div class="d-flex justify-content-end">
+                <div class="card-title">
+                    Project List
+                </div>
+                <div class="card-tools">
                     <a href="{{ route('lecturer.create') }}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> Create</a>
-                    {{-- <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#create-modal">
-                        <i class="fa fa-plus"></i> Create
-                    </button> --}}
                 </div>
             </div>
 
@@ -47,22 +47,25 @@
                                 <td>{{ $project->description }}</td>
                                 <td>
                                     <a href="{{ route('lecturer.show', $project->id) }}"
-                                        class="btn btn-sm btn-info"><i class="fa fa-eye"></i></a>
-                                    <a href="#" class="btn btn-sm btn-warning" data-toggle="modal"
-                                        data-target="#update-modal" data-id="{{ $project->id }}"
-                                        data-name="{{ $project->project_name }}" data-code="{{ $project->project_code }}"
-                                        data-description="{{ $project->description }}"
-                                        data-max-groups="{{ $project->max_groups }}"
-                                        data-max-group-members="{{ $project->max_group_members }}">
-                                        <i class="fa fa-edit"></i>
+                                        class="btn btn-sm btn-info"><i class="fa fa-eye"></i>
+                                    </a>
+                                    @if (!$project->groups->contains('is_lecturer_evaluate', 1) && !$project->groups->contains('is_assessor_evaluate', 1) && !$project->groups->contains('is_peer_evaluate', 1))
+                                        <a href="{{ route('lecturer.edit', $project->id) }}" 
+                                            class="btn btn-sm btn-warning"><i class="fa fa-edit"></i>
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('lecturer.students-mark', $project->id) }}"
+                                        class="btn btn-sm btn-primary"><i class="fa fa-clipboard"></i>
                                     </a>
                                     <form action="{{ route('lecturer.destroy', $project->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i></button>
+                                            onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i>
+                                        </button>
                                     </form>
+                                    
                                 </td>
                             </tr>
                         @empty

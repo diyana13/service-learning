@@ -5,7 +5,7 @@
     <div class="card card-maroon card-outline">
         <div class="card-header">
             <div class="d-flex justify-content-end">
-                <a href="{{ route('student.student-project') }}" class="btn btn-sm btn-danger">Back</a>
+                <a href="{{ route('student.student-project') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
              </div>
         </div>
 
@@ -21,7 +21,7 @@
                 {{ $message }}
             </div>
             @endif
-
+            <h4><b>Project Details</b></h4>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -51,7 +51,7 @@
                         <div class="card-body">
                             <ul>
                                 @forelse ($group->members as $member)
-                                    <li>{{ $member->name }}</li>
+                                    <li>{{ $member->student->name }}</li>
                                 @empty
                                     <li>No student in this group</li>
                                 @endforelse
