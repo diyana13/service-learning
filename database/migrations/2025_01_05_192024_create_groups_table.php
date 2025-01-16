@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('project_id')->constrained('projects', 'id')->cascadeOnDelete();
             $table->string('group_number');
+            $table->boolean('is_lecturer_evaluate')->default(false);
+            $table->boolean('is_assessor_evaluate')->default(false);
             $table->timestamps();
         });
     }

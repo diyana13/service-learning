@@ -36,4 +36,19 @@ class Project extends Model
     {
         return $this->hasMany(ProjectRubric::class, 'project_id');
     }
+
+    public function assessments()
+    {
+        return $this->hasMany(Assessment::class, 'project_id');
+    }
+
+    public function peersAssessments()
+    {
+        return $this->hasMany(PeersAssessment::class, 'project_id');
+    }
+
+    public function studentMarks()
+    {
+        return $this->hasMany(StudentMark::class, 'project_id');
+    }
 }

@@ -11,6 +11,9 @@ class Group extends Model
     protected $fillable = [
         'project_id',
         'group_number',
+        'is_lecturer_evaluate',
+        'is_assessor_evaluate',
+        'is_peer_evaluate',
     ];
 
     public function project()
@@ -20,6 +23,16 @@ class Group extends Model
 
     public function members()
     {
-        return $this->belongsToMany(User::class, 'group_members', 'group_id', 'student_id');
+        return $this->hasMany(GroupMembers::class, 'group_id');
+    }
+
+    public function assessments()
+    {
+        return $this->hasMany(Assessment::class, 'group_id');
+    }
+
+    public function peersAssessments()
+    {
+        return $this->hasMany(PeersAssessment::class, 'group_id');
     }
 }

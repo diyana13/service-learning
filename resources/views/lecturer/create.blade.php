@@ -5,7 +5,7 @@
         <div class="card card-primary card-outline">
             <div class="card-header">
                 <div class="d-flex justify-content-end">
-                    <a href="{{ route('lecturer.projects') }}" class="btn btn-sm btn-danger">Back</a>
+                    <a href="{{ route('lecturer.projects') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
                 </div>
             </div>
 
@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-6">
                                     <label for="max_group_members">Max Group Members</label>
-                                    <input type="number" class="form-control" name="max_group_members"
+                                    <input type="number" class="form-control" name="max_group_members" min="2"
                                         value="{{ old('max_group_members') }}">
                                     @error('max_group_members')
                                         <span class="text-danger">{{ $message }}</span>

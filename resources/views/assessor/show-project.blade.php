@@ -5,7 +5,7 @@
     <div class="card card-maroon card-outline">
         <div class="card-header">
             <div class="d-flex justify-content-end">
-                <a href="{{ route('assessor.project-list') }}" class="btn btn-sm btn-danger">Back</a>
+                <a href="{{ route('assessor.project-list') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
              </div>
         </div>
 
@@ -46,7 +46,19 @@
                 <div class="col-lg-4">
                     <div class="card card-maroon card-outline">
                         <div class="card-header">
-                            <h5 class="m-0">Group {{ $loop->iteration }}</h5>
+                            <div class="card-title">
+                                Group {{ $loop->iteration }}
+                            </div>
+
+                            <div class="card-tools">
+                                @if($group->members->count() == $project->max_group_members && $group->is_assessor_evaluate == 0)
+                                    <a href="{{ route('assessor.evaluate', $group->id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fa fa-check-square"></i> Evaluate
+                                    </a>
+                                @elseif($group->is_assessor_evaluate == 1)
+                                    <span class="text-success"><i class="fa fa-check"></i> Evaluated</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="card-body">
                             <ul>

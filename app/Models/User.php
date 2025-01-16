@@ -53,11 +53,26 @@ class User extends Authenticatable
 
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'group_members', 'student_id', 'group_id');
+        return $this->hasMany(GroupMembers::class, 'student_id');
     }
 
     public function projectRegistrations()
     {
         return $this->hasMany(ProjectRegistration::class, 'student_id');
+    }
+
+    public function assessments()
+    {
+        return $this->hasMany(Assessment::class, 'student_id');
+    }
+
+    public function peersAssessments()
+    {
+        return $this->hasMany(PeersAssessment::class, 'student_id');
+    }
+
+    public function studentMarks()
+    {
+        return $this->hasMany(StudentMark::class, 'student_id');
     }
 }

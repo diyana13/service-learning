@@ -5,7 +5,7 @@
     <div class="card card-primary card-outline">
         <div class="card-header">
             <div class="d-flex justify-content-end">
-                <a href="{{ route('student.student-project') }}" class="btn btn-sm btn-danger">Back</a>
+                <a href="{{ route('student.student-project') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
             </div>
         </div>
 
