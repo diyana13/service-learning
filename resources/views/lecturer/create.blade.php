@@ -27,7 +27,7 @@
 
                     <div class="mb-4">
                         <div class="form-group">
-                            <label for="prject_name">Name</label>
+                            <label for="prject_name">Project Name</label>
                             <input type="text" class="form-control" name="project_name"
                                 value="{{ old('project_name') }}">
                             @error('project_name')
@@ -36,7 +36,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="project_code">Code</label>
+                            <label for="project_code">Project Code</label>
                             <input type="text" class="form-control" name="project_code"
                                 value="{{ $uniqueCode ?? old('project_code') }}" readonly>
                             @error('project_code')
@@ -45,7 +45,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="description">Description</label>
+                            <label for="description">Project Description</label>
                             <textarea class="form-control" name="description">{{ old('description') }}</textarea>
                             @error('description')
                                 <span class="text-danger">{{ $message }}</span>
@@ -55,7 +55,7 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-6">
-                                    <label for="max_groups">Max Group</label>
+                                    <label for="max_groups">Max No of Group</label>
                                     <input type="number" class="form-control" name="max_groups"
                                         value="{{ old('max_groups') }}">
                                     @error('max_groups')
@@ -63,7 +63,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-6">
-                                    <label for="max_group_members">Max Group Members</label>
+                                    <label for="max_group_members">Max No of Group Members</label>
                                     <input type="number" class="form-control" name="max_group_members" min="2"
                                         value="{{ old('max_group_members') }}">
                                     @error('max_group_members')
@@ -74,10 +74,13 @@
                         </div>
 
                         <div class="form-group mt-4">
+                            <div class="alert alert-info mb-3">
+                                <i class="fas fa-info-circle"></i> Please select learning outcomes for each role below
+                            </div>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th class="text-center">Rubric</th>
+                                        <th class="text-center">Learning OutCome</th>
                                         <th class="text-center">Lecturer</th>
                                         <th class="text-center">Assessor</th>
                                         <th class="text-center">Student</th>

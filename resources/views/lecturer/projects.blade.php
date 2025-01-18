@@ -124,7 +124,7 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-6">
-                                        <label for="max_groups">Max Group</label>
+                                        <label for="max_groups">Max No of Group</label>
                                         <input type="number" class="form-control" name="max_groups"
                                             id="edit-max-groups" readonly>
                                         @error('max_groups')
@@ -132,7 +132,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-6">
-                                        <label for="max_group_members">Max Group Members</label>
+                                        <label for="max_group_members">Max No of Group Members</label>
                                         <input type="number" class="form-control" name="max_group_members"
                                             id="edit-max-group-members">
                                         @error('max_group_members')

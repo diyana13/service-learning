@@ -4,23 +4,7 @@
         <li class="nav-item">
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
-        @auth
-            @if (Auth::user()->getRoleNames()->first() == 'lecturer')
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{{ route('lecturer.home') }}" class="nav-link">Home</a>
-                </li>
-            @endif
-            @if (Auth::user()->getRoleNames()->first() == 'student')
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{{ route('student.home') }}" class="nav-link">Home</a>
-                </li>
-            @endif
-            @if (Auth::user()->getRoleNames()->first() == 'assessor')
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{{ route('assessor.home') }}" class="nav-link">Home</a>
-                </li>
-            @endif
-        @endauth
+    
     </ul>
 
     <!-- Right navbar links -->
