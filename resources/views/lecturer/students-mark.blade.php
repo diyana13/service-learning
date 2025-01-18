@@ -23,9 +23,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($studentsMarks as $student)
+                    @forelse ($students as $student)
                         <tr>
-                            <td>{{ $student->student->name }}</td>
+                            <td>{{ $student->users->name }}</td>
                             @if ($student->lecturer_score == null)
                                 <td class="text-center"><span class="text-danger"><b>Pending Evaluation</b></span></td>
                             @else
@@ -38,16 +38,16 @@
                                 <td class="text-center">{{ $student->assessor_score }}</td>
                             @endif
                             
-                            @if($student->peer_score == null)
+                            @if($student->is_evaluated == false)
                                 <td class="text-center"><span class="text-danger"><b>Pending Evaluation</b></span></td>
                             @else
-                                <td class="text-center">{{ $student->peer_score }}</td>
+                                <td class="text-center">{{ $student->calc_peers_score }}</td>
                             @endif
 
-                            @if ($student->total_score == null)
+                            @if ($student->lecturer_score == null || $student->assessor_score == null || $student->is_evaluated == false)
                                 <td class="text-center"><span class="text-danger"><b>Pending Evaluation</b></span></td>
                             @else
-                                <td class="text-center">{{ $student->total_score }}</td>
+                                <td class="text-center">{{ $student->total_marks }}</td>
                             @endif
                             
                         </tr>

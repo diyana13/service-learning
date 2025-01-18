@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('group_number');
             $table->boolean('is_lecturer_evaluate')->default(false);
             $table->boolean('is_assessor_evaluate')->default(false);
+            $table->boolean('is_peer_evaluate')->default(false);
             $table->timestamps();
         });
     }
