@@ -277,10 +277,10 @@ class ProjectController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error evaluating group: ' . $e->getMessage());
-            return redirect()->route('lecturer.show', $id)->with('error', 'An error occurred while evaluating the group');
+            return redirect()->route('lecturer.show', $project->id)->with('error', 'An error occurred while evaluating the group');
         }
 
-        return redirect()->route('lecturer.show', $id)->with('success', 'Group evaluated successfully');
+        return redirect()->route('lecturer.show', $project->id)->with('success', 'Group evaluated successfully');
     }
 
     public function studentsMark($id)
