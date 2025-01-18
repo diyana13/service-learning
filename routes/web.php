@@ -38,6 +38,8 @@ Route::group(['middleware' => ['auth', 'role:student']], function () {
     Route::post('student/projects/search', [StudentController::class, 'search'])->name('student.search-project');
     Route::post('student/projects/{project}/register', [StudentController::class, 'register'])->name('student.register');
     Route::get('student/projects/{project}/show', [StudentController::class, 'show'])->name('student.show-project');
+    Route::get('student/projects/{project}/{group}/{groupMember}/evaluate', [StudentController::class, 'evaluate'])->name('student.evaluate');
+    Route::post('student/projects/store', [StudentController::class, 'storeEvaluation'])->name('student.store-evaluation');
 });
 
 Route::group(['middleware' => ['auth', 'role:assessor']], function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assessment;
 use App\Models\Group;
 use App\Models\GroupMembers;
+use App\Models\PeersAssessment;
 use App\Models\Project;
 use App\Models\ProjectRegistration;
 use App\Models\ProjectRubric;
@@ -277,20 +278,44 @@ class ProjectController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Error evaluating group: ' . $e->getMessage());
-            return redirect()->route('lecturer.show', $id)->with('error', 'An error occurred while evaluating the group');
+            return redirect()->route('lecturer.show', $project->id)->with('error', 'An error occurred while evaluating the group');
         }
 
-        return redirect()->route('lecturer.show', $id)->with('success', 'Group evaluated successfully');
+        return redirect()->route('lecturer.show', $project->id)->with('success', 'Group evaluated successfully');
     }
 
     public function studentsMark($id)
     {
-        // $project = Project::findOrFail($id);
-
-        $studentsMarks = StudentMark::where('project_id', $id)
-            ->with('student')
+        $students = ProjectRegistration::with('users')
+            ->where('project_registrations.project_id', $id)
+            ->join('student_marks', 'student_marks.student_id', '=', 'project_registrations.user_id')
+            ->where('student_marks.project_id', $id)
             ->get();
 
-        return view('lecturer.students-mark', compact('studentsMarks'));
+        $project = Project::findOrFail($id);
+        $group = Group::where('project_id', $id)->get();
+        
+
+        $students = $students->map(function ($student) use ($project) {
+            $student->calc_peers_score = $student->peers_score / (($project->max_group_members - 1) * 15) * 15;
+            $student->total_marks = $student->lecturer_score + $student->assessor_score + $student->calc_peers_score;
+
+            // check if the student already been assessed by all group members
+            $totalPeerAssessed = PeersAssessment::where('project_id', $student->project_id)
+                    ->where('evaluatee_id', $student->user_id)
+                    ->count();
+
+            if ($totalPeerAssessed == $project->max_group_members - 1) {
+                $student->is_evaluated = true;
+            } else {
+                $student->is_evaluated = false;
+            }
+
+            return $student;
+        });
+
+        // dd($students);
+
+        return view('lecturer.students-mark', compact('students'));
     }
 }

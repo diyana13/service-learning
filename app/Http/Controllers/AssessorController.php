@@ -115,9 +115,9 @@ class AssessorController extends Controller
         }
         catch (\Exception $e) {
             Log::error('Error evaluating group: ' . $e->getMessage());
-            return redirect()->route('assessor.show-project', $id)->with('error', 'An error occurred while evaluating the group');
+            return redirect()->route('assessor.show-project', $project->id)->with('error', 'An error occurred while evaluating the group');
         }
 
-        return redirect()->route('assessor.show-project', $id)->with('success', 'Group evaluated successfully');
+        return redirect()->route('assessor.show-project', $project->id)->with('success', 'Group evaluated successfully');
     }
 }
