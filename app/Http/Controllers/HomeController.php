@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
+use App\Models\PeersAssessment;
+use App\Models\Project;
+use App\Models\ProjectRegistration;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -28,16 +32,79 @@ class HomeController extends Controller
 
     public function lecturerIndex()
     {
-        return view('lecturer.home');
+        $totalProjects = Project::with('lecturer')->count();
+
+        $pendingAssessment = Project::with(['lecturer', 'groups' => function ($query) {
+            $query->where('is_lecturer_evaluate', false);
+        }])->get();
+
+        $pendingAssessmentCount = $pendingAssessment->map(function ($project) {
+            return $project->groups->count();
+        })->sum();
+
+        $completedAssessment = Project::with(['lecturer', 'groups' => function ($query) {
+            $query->where('is_lecturer_evaluate', true);
+        }])->get();
+
+        $completedAssessmentCount = $completedAssessment->map(function ($project) {
+            return $project->groups->count();
+        })->sum();
+
+        return view('lecturer.home', compact('totalProjects', 'pendingAssessmentCount', 'completedAssessmentCount'));
     }
 
     public function studentIndex()
     {
-        return view('student.home');
+        $user = auth()->user();
+
+        // Total Projects
+        $totalProjects = ProjectRegistration::where('user_id', $user->id)->count();
+
+        $pendingAssessmentCount = Group::whereHas('members', function ($query) use ($user) {
+            $query->where('student_id', $user->id); // Get groups the user is part of
+        })->with(['members', 'peersAssessments'])->get()->sum(function ($group) use ($user) {
+            // Total peers in the group (excluding the user)
+            $totalPeers = $group->members->where('student_id', '!=', $user->id)->count();
+    
+            // Count peers already evaluated by the user
+            $evaluatedPeers = $group->peersAssessments->where('evaluator_id', $user->id)->pluck('evaluatee_id')->unique()->count();
+    
+            // Pending evaluations for this group
+            return $totalPeers - $evaluatedPeers;
+        });
+
+        // Completed Assessments
+        $completedAssessmentCount = PeersAssessment::where('evaluator_id', $user->id)->count();
+
+        // dd($completedAssessmentCount);
+
+        return view('student.home', compact('totalProjects', 'pendingAssessmentCount', 'completedAssessmentCount'));
     }
 
     public function assessorIndex()
     {
-        return view('assessor.home');
+        $user = auth()->user();
+
+        $totalProjects = ProjectRegistration::where('user_id', $user->id)->count();
+
+        $project = ProjectRegistration::where('user_id', $user->id)->get();
+
+        $pendingAssessment = Group::whereHas('project', function ($query) use ($user) {
+            $query->whereHas('registrations', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->where('is_assessor_evaluate', false)->get();
+
+        $pendingAssessmentCount = $pendingAssessment->count();
+
+        $completedAssessment = Group::whereHas('project', function ($query) use ($user) {
+            $query->whereHas('registrations', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->where('is_assessor_evaluate', true)->get();
+
+        $completedAssessmentCount = $pendingAssessment->count();
+
+        return view('assessor.home', compact('totalProjects', 'pendingAssessmentCount', 'completedAssessmentCount'));
     }
 }

@@ -10,7 +10,7 @@ class ProjectRegistration extends Model
 
     protected $fillable = [
         'project_id',
-        'student_id',
+        'user_id',
     ];
 
     public function users()

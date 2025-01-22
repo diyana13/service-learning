@@ -157,7 +157,14 @@ class StudentController extends Controller
             // dd($groupMembers);
         }
 
-        return view('student.show-project', compact('project', 'groupMembers'));
+        // get student marks
+        $studentMarks = StudentMark::where('student_id', $student->id)
+            ->where('project_id', $project->id)
+            ->first();
+
+        $studentMarks->total_score = $studentMarks->lecturer_score + $studentMarks->assessor_score + $studentMarks->peers_score;
+
+        return view('student.show-project', compact('project', 'groupMembers', 'studentMarks'));
     }
 
     public function evaluate($projectId, $groupId, $memberId)

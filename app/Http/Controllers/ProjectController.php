@@ -286,6 +286,8 @@ class ProjectController extends Controller
 
     public function studentsMark($id)
     {
+        $lecturerId = auth()->user();
+
         $students = ProjectRegistration::with('users')
             ->where('project_registrations.project_id', $id)
             ->join('student_marks', 'student_marks.student_id', '=', 'project_registrations.user_id')
@@ -295,8 +297,7 @@ class ProjectController extends Controller
         $project = Project::findOrFail($id);
         $group = Group::where('project_id', $id)->get();
         
-
-        $students = $students->map(function ($student) use ($project) {
+        $students = $students->map(function ($student) use ($project, $lecturerId, $group) {
             $student->calc_peers_score = $student->peers_score / (($project->max_group_members - 1) * 15) * 15;
             $student->total_marks = $student->lecturer_score + $student->assessor_score + $student->calc_peers_score;
 
@@ -309,6 +310,25 @@ class ProjectController extends Controller
                 $student->is_evaluated = true;
             } else {
                 $student->is_evaluated = false;
+            }
+
+            // check the student group first
+            $studentGroup = GroupMembers::where('student_id', $student->user_id)
+                ->whereIn('group_id', $group->pluck('id'))
+                ->first();
+
+            $student->groupId = $studentGroup->group_id;
+
+            // fetch data comment from assessor
+            $assessorComment = Assessment::where('project_id', $student->project_id)
+                ->where('group_id', $studentGroup->group_id)
+                ->where('assessor_id', '!=', $lecturerId->id)
+                ->first();
+
+            if ($assessorComment) {
+                $student->assessor_comment = $assessorComment->comment;
+            } else {
+                $student->assessor_comment = '';
             }
 
             return $student;

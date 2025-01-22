@@ -1,6 +1,7 @@
 @extends('layouts.template-layout')
 
 @section('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bootstrap4.css">
 @endsection
 
 @section('content')
@@ -11,7 +12,8 @@
                     Project List
                 </div>
                 <div class="card-tools">
-                    <a href="{{ route('lecturer.create') }}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> Create</a>
+                    <a href="{{ route('lecturer.create') }}" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i>
+                        Create</a>
                 </div>
             </div>
 
@@ -28,7 +30,7 @@
                     </div>
                 @endif
 
-                <table class="table table-bordered">
+                <table id="projectList" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -46,11 +48,14 @@
                                 <td>{{ $project->project_code }}</td>
                                 <td>{{ $project->description }}</td>
                                 <td>
-                                    <a href="{{ route('lecturer.show', $project->id) }}"
-                                        class="btn btn-sm btn-info"><i class="fa fa-eye"></i>
+                                    <a href="{{ route('lecturer.show', $project->id) }}" class="btn btn-sm btn-info"><i
+                                            class="fa fa-eye"></i>
                                     </a>
-                                    @if (!$project->groups->contains('is_lecturer_evaluate', 1) && !$project->groups->contains('is_assessor_evaluate', 1) && !$project->groups->contains('is_peer_evaluate', 1))
-                                        <a href="{{ route('lecturer.edit', $project->id) }}" 
+                                    @if (
+                                        !$project->groups->contains('is_lecturer_evaluate', 1) &&
+                                            !$project->groups->contains('is_assessor_evaluate', 1) &&
+                                            !$project->groups->contains('is_peer_evaluate', 1))
+                                        <a href="{{ route('lecturer.edit', $project->id) }}"
                                             class="btn btn-sm btn-warning"><i class="fa fa-edit"></i>
                                         </a>
                                     @endif
@@ -65,7 +70,7 @@
                                             onclick="return confirm('Are you sure?')"><i class="fa fa-trash"></i>
                                         </button>
                                     </form>
-                                    
+
                                 </td>
                             </tr>
                         @empty
@@ -125,8 +130,8 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <label for="max_groups">Max No of Group</label>
-                                        <input type="number" class="form-control" name="max_groups"
-                                            id="edit-max-groups" readonly>
+                                        <input type="number" class="form-control" name="max_groups" id="edit-max-groups"
+                                            readonly>
                                         @error('max_groups')
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
@@ -156,6 +161,8 @@
 @endsection
 
 @push('scripts')
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap4.js"></script>
     <script>
         $('#update-modal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget); // Button that triggered the modal
@@ -179,6 +186,15 @@
             var formAction = "{{ route('lecturer.update', ':id') }}";
             formAction = formAction.replace(':id', id);
             modal.find('#edit-form').attr('action', formAction);
+        });
+
+        // DataTable
+        let table = new DataTable('#projectList', {
+            columnDefs: [{
+                    orderable: false,
+                    targets: [-1]
+                } 
+            ]
         });
     </script>
 @endpush

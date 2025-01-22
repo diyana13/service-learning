@@ -26,23 +26,6 @@
                     </div>
                 @endif
 
-                {{-- <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Code</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ $project->project_name }}</td>
-                            <td>{{ $project->project_code }}</td>
-                            <td>{{ $project->description }}</td>
-                        </tr>
-                    </tbody>
-                </table> --}}
-
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Project Name</label>
                     <div class="col-sm-1 col-form-label text-right"><strong>:</strong></div>

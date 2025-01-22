@@ -1,5 +1,9 @@
 @extends('layouts.template-layout')
 
+@section('styles')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.2.1/css/dataTables.bootstrap4.css">
+@endsection
+
 @section('content')
 <div class="col-lg-12">
     <div class="card card-maroon card-outline">
@@ -24,7 +28,7 @@
             </div>
             @endif
 
-            <table class="table table-bordered">
+            <table id="projectList" class="table table-bordered">
                 <thead>
                     <tr>
                         <th>No</th>
@@ -89,3 +93,17 @@
     <!-- /.modal-dialog -->
 </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap4.js"></script>
+    <script>
+        let table = new DataTable('#projectList', {
+            columnDefs: [{
+                    orderable: false,
+                    targets: [-1]
+                } 
+            ]
+        });
+    </script>
+@endpush
