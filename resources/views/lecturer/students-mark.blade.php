@@ -74,6 +74,9 @@
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap4.js"></script>
     <script>
         let table = new DataTable('#studentMark', {
+            language: {
+                emptyTable: "No projects available"
+            },
             columnDefs: [{
                     orderable: false,
                     targets: [-1]

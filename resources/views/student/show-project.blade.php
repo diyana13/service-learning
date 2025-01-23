@@ -133,6 +133,8 @@
                                 <td class="text-center">Peers</td>
                                 @if($studentMarks->peers_score == null)
                                     <td class="text-center text-danger">Pending Evaluation</td>
+                                @elseif($isPeerEvaluated == false)
+                                    <td class="text-center text-danger">Pending Evaluation</td>
                                 @else
                                     <td class="text-center">{{ $studentMarks->peers_score }}</td>
                                 @endif
