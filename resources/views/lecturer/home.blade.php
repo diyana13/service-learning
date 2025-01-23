@@ -40,26 +40,26 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Pending Assessments -->
+                    <!-- Pending Evaluations -->
                     <div class="col-md-4">
                         <div class="small-box bg-warning">
                             <div class="inner">
                                 <h3>{{ $pendingAssessmentCount ?? 0 }}</h3>
 
-                                <p>Pending Assessments</p>
+                                <p>Pending Evaluations</p>
                             </div>
                             <div class="icon">
                                 <i class="fas fa-hourglass-half"></i>
                             </div>
                         </div>
                     </div>
-                    <!-- Completed Assessments -->
+                    <!-- Completed Evaluation -->
                     <div class="col-md-4">
                         <div class="small-box bg-success">
                             <div class="inner">
                                 <h3>{{ $completedAssessmentCount ?? 0 }}</h3>
 
-                                <p>Completed Assessments</p>
+                                <p>Completed Evaluations</p>
                             </div>
                             <div class="icon">
                                 <i class="fas fa-check"></i>

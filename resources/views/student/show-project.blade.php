@@ -143,7 +143,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Total Marks (%)</th>
+                                <th>Total Marks (50%)</th>
                                 @if($studentMarks->total_score == null)
                                     <th class="text-center text-danger">Pending Evaluation</th>
                                 @elseif($studentMarks->lecturer_score == null || $studentMarks->assessor_score == null || $studentMarks->peers_score == null)

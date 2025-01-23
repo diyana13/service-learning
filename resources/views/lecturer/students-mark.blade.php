@@ -20,11 +20,11 @@
                 <thead>
                     <tr>
                         <th style="width: 45rem">Student Name</th>
-                        <th class="text-center">Lecturer Marks (%)</th>
-                        <th class="text-center">Assessor Marks (%)</th>
-                        <th class="text-center">Peers Marks (%)</th>
-                        <th class="text-center">Total Marks (%)</th>
-                        <th class="text-center" style="width: 20rem;">Feedback</th>
+                        <th class="text-center">Lecturer Marks (20%)</th>
+                        <th class="text-center">Assessor Marks (15%)</th>
+                        <th class="text-center">Peers Marks (15%)</th>
+                        <th class="text-center">Total Marks (50%)</th>
+                        <th class="text-center" style="width: 20rem;">Feedback from Assessor</th>
                     </tr>
                 </thead>
                 <tbody>

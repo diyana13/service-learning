@@ -43,7 +43,7 @@
                         <div class="inner">
                             <h3>{{ $pendingAssessmentCount ?? 0 }}</h3>
 
-                            <p>Pending Assessments</p>
+                            <p>Pending Evaluations</p>
                         </div>
                         <div class="icon">
                             <i class="fas fa-hourglass-half"></i>
@@ -56,7 +56,7 @@
                         <div class="inner">
                             <h3>{{ $completedAssessmentCount ?? 0 }}</h3>
 
-                            <p>Completed Assessments</p>
+                            <p>Completed Evaluations</p>
                         </div>
                         <div class="icon">
                             {{-- <i class="fas fa-chart-pie"></i> --}}
