@@ -50,9 +50,7 @@
                         </td>
                     </tr>
                     @empty
-                    <tr>
-                        <td colspan="5" class="text-center">No data</td>
-                    </tr>
+                    
                     @endforelse
                 </tbody>
             </table>
@@ -99,6 +97,9 @@
     <script src="https://cdn.datatables.net/2.2.1/js/dataTables.bootstrap4.js"></script>
     <script>
         let table = new DataTable('#projectList', {
+            language: {
+                emptyTable: "No projects available"
+            },
             columnDefs: [{
                     orderable: false,
                     targets: [-1]
