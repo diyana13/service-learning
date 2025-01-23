@@ -1,90 +1,154 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AssessPro - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
 
-                <div class="card-body">
-                    <form method="POST" action="{{ route('register') }}">
-                        @csrf
+        .login-container {
+            max-width: 33rem;
+            margin: 50px auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
 
-                        <div class="row mb-3">
-                            <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" required autocomplete="name" autofocus>
+        .login-header h1 {
+            font-weight: 600;
+            color: #dc3545;
+        }
 
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+        .login-form .form-control {
+            border-color: #ced4da;
+        }
 
-                        <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
+        .login-form .is-invalid {
+            border-color: #dc3545;
+        }
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email">
+        .login-form .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
 
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+        .login-form .btn-primary {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+        .login-form .btn-primary:hover {
+            background-color: #c21f3a;
+            border-color: #c21f3a;
+        }
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+        .login-footer a {
+            color: #6c757d;
+            text-decoration: none;
+        }
 
-                        <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
+        .login-footer a:hover {
+            color: #495057;
+        }
 
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
-                            </div>
-                        </div>
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
 
-                        <div class="row mb-3">
-                            <label for="role" class="col-md-4 col-form-label text-md-end">Role</label>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <img src="{{ asset('img') }}/logo.JPEG" style="height: 4rem; margin-bottom: 1rem;">
+            {{-- <h1>AssessPro</h1> --}}
+            <p class="text-muted">Welcome new user !</p>
+        </div>
+        <form class="login-form" method="POST" action="{{ route('login') }}">
+            @csrf
 
-                            <div class="col-md-6">
-                                <select name="role" class="form-control" required autocomplete="role">
-                                    <option value="">-- Select Role --</option>
-                                    <option value="lecturer">Lecturer</option>
-                                    <option value="student">Student</option>
-                                    <option value="assessor">Assessor</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Register') }}
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
+                    name="name" value="{{ old('name') }}" autocomplete="name" autofocus placeholder="Enter your name">
+                
+                    @error('name')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
             </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror"
+                    name="email" value="{{ old('email') }}" autocomplete="email" placeholder="Enter your email">
+
+                @error('email')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror"
+                    name="password" autocomplete="new-password" placeholder="Enter your password">
+
+                @error('password')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="password-confirm" class="form-label">Confirm Password</label>
+                <input id="password-confirm" type="password" class="form-control" name="password_confirmation"
+                    autocomplete="new-password" placeholder="Confirm your password">
+
+                @error('confrim')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+
+                <select name="role" class="form-control" required autocomplete="role">
+                    <option value="">-- Select Your Role --</option>
+                    <option value="lecturer">Lecturer</option>
+                    <option value="student">Student</option>
+                    <option value="assessor">Assessor</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign up</button>
+        </form>
+        <div class="login-footer">
+            Already have an account? <a href="{{ route('login') }}">Sign in</a>
         </div>
     </div>
-</div>
-@endsection
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

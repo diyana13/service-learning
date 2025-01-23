@@ -37,7 +37,7 @@
                             <th>Name</th>
                             <th>Code</th>
                             <th>Description</th>
-                            <th></th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,9 +74,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="5" class="text-center">No data</td>
-                            </tr>
+                            
                         @endforelse
                     </tbody>
                 </table>
@@ -190,11 +188,13 @@
 
         // DataTable
         let table = new DataTable('#projectList', {
+            language: {
+                emptyTable: "No projects available"
+            },
             columnDefs: [{
-                    orderable: false,
-                    targets: [-1]
-                } 
-            ]
+                orderable: false,
+                targets: [-1]
+            }]
         });
     </script>
 @endpush
