@@ -157,6 +157,19 @@ class StudentController extends Controller
             // dd($groupMembers);
         }
 
+        // check if the student has been evaluated by peers
+        $isPeerEvaluated = PeersAssessment::where('project_id', $project->id)
+            ->where('evaluatee_id', $student->id)
+            ->count();
+        
+        if($isPeerEvaluated == $project->max_group_members - 1) {
+            $isPeerEvaluated = true;
+        }
+        else {
+            $isPeerEvaluated = false;
+        }
+
+
         // get student marks
         $studentMarks = StudentMark::where('student_id', $student->id)
             ->where('project_id', $project->id)
@@ -164,7 +177,7 @@ class StudentController extends Controller
 
         $studentMarks->total_score = $studentMarks->lecturer_score + $studentMarks->assessor_score + $studentMarks->peers_score;
 
-        return view('student.show-project', compact('project', 'groupMembers', 'studentMarks'));
+        return view('student.show-project', compact('project', 'groupMembers', 'studentMarks', 'isPeerEvaluated'));
     }
 
     public function evaluate($projectId, $groupId, $memberId)
