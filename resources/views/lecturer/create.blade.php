@@ -76,6 +76,7 @@
                         <div class="form-group mt-4">
                             <div class="alert alert-info mb-3">
                                 <i class="fas fa-info-circle"></i> Please select learning outcomes for each role below
+                                <p>You have to select 4 learning outcomes for lecturer, 3 for assessor and 3 for student.</p>
                             </div>
                             <table class="table table-bordered">
                                 <thead>

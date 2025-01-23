@@ -6,7 +6,7 @@
 
 @section('content')
     <div class="col-lg-12">
-        <div class="card card-primary card-outline">
+        <div class="card card-maroon card-outline">
             <div class="card-header">
                 <div class="card-title">
                     Project List
@@ -37,7 +37,7 @@
                             <th>Name</th>
                             <th>Code</th>
                             <th>Description</th>
-                            <th>Action</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
