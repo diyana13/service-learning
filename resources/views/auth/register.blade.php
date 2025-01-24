@@ -83,7 +83,7 @@
             {{-- <h1>AssessPro</h1> --}}
             <p class="text-muted">Welcome new user !</p>
         </div>
-        <form class="login-form" method="POST" action="{{ route('login') }}">
+        <form class="login-form" method="POST" action="{{ route('register') }}">
             @csrf
 
             <div class="mb-3">
