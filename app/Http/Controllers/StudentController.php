@@ -169,11 +169,12 @@ class StudentController extends Controller
             $isPeerEvaluated = false;
         }
 
-
         // get student marks
         $studentMarks = StudentMark::where('student_id', $student->id)
             ->where('project_id', $project->id)
             ->first();
+
+        $studentMarks->peers_score = $studentMarks->peers_score / (($project->max_group_members - 1) * 15) * 15;
 
         $studentMarks->total_score = $studentMarks->lecturer_score + $studentMarks->assessor_score + $studentMarks->peers_score;
 
