@@ -32,11 +32,13 @@ class HomeController extends Controller
 
     public function lecturerIndex()
     {
-        $totalProjects = Project::with('lecturer')->count();
+        $user = auth()->user();
+
+        $totalProjects = Project::with('lecturer')->where('lecturer_id', $user->id)->count();
 
         $pendingAssessment = Project::with(['lecturer', 'groups' => function ($query) {
             $query->where('is_lecturer_evaluate', false);
-        }])->get();
+        }])->where('lecturer_id', $user->id)->get();
 
         $pendingAssessmentCount = $pendingAssessment->map(function ($project) {
             return $project->groups->count();
@@ -44,7 +46,7 @@ class HomeController extends Controller
 
         $completedAssessment = Project::with(['lecturer', 'groups' => function ($query) {
             $query->where('is_lecturer_evaluate', true);
-        }])->get();
+        }])->where('lecturer_id', $user->id)->get();
 
         $completedAssessmentCount = $completedAssessment->map(function ($project) {
             return $project->groups->count();
