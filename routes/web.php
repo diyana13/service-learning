@@ -31,6 +31,9 @@ Route::group(['middleware' => ['auth', 'role:lecturer']], function () {
 
     Route::get('lecturer/projects/{group}/evaluate', [ProjectController::class, 'evaluate'])->name('lecturer.evaluate');
     Route::post('lecturer/projects/{group}/store', [ProjectController::class, 'storeEvaluate'])->name('lecturer.store-evaluate');
+
+    // PDF route
+    Route::get('lecturer/projects/{project}/students_mark/pdf', [ProjectController::class, 'generatePdf'])->name('lecturer.generate-pdf');
 });
 
 Route::group(['middleware' => ['auth', 'role:student']], function () {

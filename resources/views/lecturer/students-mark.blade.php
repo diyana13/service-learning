@@ -12,7 +12,10 @@
                 Students Mark
             </div>
             <div class="card-tools">
-                <a href="{{ route('lecturer.projects') }}" class="btn btn-sm btn-danger"><i class="fa fa-angle-left"></i> Back</a>
+                <a href="{{ route('lecturer.projects') }}" class="btn btn-sm btn-default"><i class="fa fa-angle-left"></i> Back</a>
+                &nbsp;
+                <a href="{{ route('lecturer.generate-pdf', $project->id) }}" target="_blank" class="btn btn-sm btn-danger"><i class="fa fa-file-pdf"></i></a>
+                &nbsp;&nbsp;
             </div>
         </div>
         <div class="card-body">
