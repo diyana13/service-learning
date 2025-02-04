@@ -49,7 +49,7 @@
                             @if($student->is_evaluated == false)
                                 <td class="text-center"><span class="text-danger"><b>Pending Evaluation</b></span></td>
                             @else
-                                <td class="text-center">{{ $student->calc_peers_score }}</td>
+                            <td class="text-center">{{ number_format($student->calc_peers_score, 2) }}</td>
                             @endif
 
                             @if ($student->lecturer_score == null || $student->assessor_score == null || $student->is_evaluated == false)
@@ -61,9 +61,7 @@
                             <td class="text-center">{{ $student->assessor_comment }}</td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="6" class="text-center">No data</td>
-                        </tr>
+                        
                     @endforelse
                 </tbody>
             </table>
